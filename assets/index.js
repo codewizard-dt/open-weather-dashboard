@@ -215,18 +215,38 @@ $('form').on('submit', handleSearch)
 
 const currentEl = $('#current')
 const fiveDayEl = $('#five-day')
+const getIconUrl = iconName => `http://openweathermap.org/img/wn/${iconName}@2x.png`
+const getDate = dt => moment(dt * 1000).format('LL')
+const getHeaderHtml = (dt, weather) => `<div class='daily-header'><h3>${getDate(dt)}<img src="${getIconUrl(weather[0].icon)}" alt="${weather[0].description}"/></h3><h4><i>${weather[0].description}</i></h4></div>`
+function renderDailyCard({ dt, temp: { min: lowTemp, max: highTemp }, wind_speed, humidity, weather }) {
+  console.log(weather)
+  const dailyCard = $(document.createElement('div'))
+  dailyCard.addClass('card')
+  $(`<div class='card-body'></div>`).appendTo(dailyCard)
+    .append(
+      `<div class='card-title'>${getHeaderHtml(dt, weather)}</div>`,
+      `<p class='card-text'>Temp: ${highTemp} / ${lowTemp}&#8457;</p>`,
+      `<p class='card-text'>Wind: ${wind_speed} mph</p>`,
+      `<p class='card-text'>Humidity: ${humidity}%</p>`,
+    )
+  return dailyCard
+}
 async function displayWeather(city) {
   // const weather = await Weather.search(city)
-  const weather = { ...city, ...exampleResponse }
-  const { city: cityName, regionCode,countryCode, current: { temp, wind_speed, humidity, uvi },daily } = weather
+  const combinedData = { ...city, ...exampleResponse }
+  const { city: cityName, regionCode, countryCode, current: { dt, temp, wind_speed, humidity, uvi, weather }, daily } = combinedData
   currentEl.html('').addClass('hasWeather')
-  currentEl.append(`<h2>${cityName}, ${regionCode}, ${countryCode}</h2>`)
-  currentEl.append(`<p>Temp: ${temp}&#8457;</p>`)
-  currentEl.append(`<p>Wind: ${wind_speed} mph</p>`)
-  currentEl.append(`<p>Humidity: ${humidity}%</p>`)
-  currentEl.append(`<p>UV Index: ${uvi}</p>`)
-  fiveDayEl.html('')
+    .append(
+      `<h2>${cityName}, ${regionCode}, ${countryCode}</h2>`,
+      getHeaderHtml(dt, weather),
+      `<p>Temp: ${temp}&#8457;</p>`,
+      `<p>Wind: ${wind_speed} mph</p>`,
+      `<p>Humidity: ${humidity}%</p>`,
+      `<p>UV Index: ${uvi}</p>`,
+    )
+
+  fiveDayEl.html('<h2>Five Day Forecast</h2>')
   for (let day of daily) {
-    console.log(day)
+    fiveDayEl.append(renderDailyCard(day))
   }
 }

@@ -26,7 +26,7 @@ h1 {
 }
 
 body {
-  font-family: 'Sarala', sans-serif;
+  font-family: 'Sarala', Roboto, sans-serif;
   font-size: 14px;
 }
 
@@ -55,4 +55,19 @@ header {
   margin: 1rem 0;
   border-radius: 0.25rem;
   border: 1px solid gray;
+}
+
+#five-day {
+  display: flex;
+  flex-wrap: wrap;
+}
+#five-day h2 {
+  flex-basis: 100%;
+}
+
+.daily-header img {
+  margin: -40px -1rem -40px 0;
+}
+.daily-header h4 {
+  margin-left: 0.5rem;
 }
