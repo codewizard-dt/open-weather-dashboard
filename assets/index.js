@@ -1,130 +1,16 @@
-const exampleResponse = {
-  "lat": 39.31,
-  "lon": -74.5,
-  "timezone": "America/New_York",
-  "timezone_offset": -18000,
-  "current": {
-    "dt": 1646318698,
-    "sunrise": 1646306882,
-    "sunset": 1646347929,
-    "temp": 282.21,
-    "feels_like": 278.41,
-    "pressure": 1014,
-    "humidity": 65,
-    "dew_point": 275.99,
-    "uvi": 2.55,
-    "clouds": 40,
-    "visibility": 10000,
-    "wind_speed": 8.75,
-    "wind_deg": 360,
-    "wind_gust": 13.89,
-    "weather": [
-      {
-        "id": 802,
-        "main": "Clouds",
-        "description": "scattered clouds",
-        "icon": "03d"
-      }
-    ]
-  },
-  "minutely": [{
-    "dt": 1646318700,
-    "precipitation": 0
-  }],
-  "hourly": [
-    {
-      "dt": 1646316000,
-      "temp": 281.94,
-      "feels_like": 278.49,
-      "pressure": 1014,
-      "humidity": 67,
-      "dew_point": 276.16,
-      "uvi": 1.49,
-      "clouds": 52,
-      "visibility": 10000,
-      "wind_speed": 7.16,
-      "wind_deg": 313,
-      "wind_gust": 10.71,
-      "weather": [
-        {
-          "id": 803,
-          "main": "Clouds",
-          "description": "broken clouds",
-          "icon": "04d"
-        }
-      ],
-      "pop": 0.03
-    }],
-  "daily": [
-    {
-      "dt": 1646326800,
-      "sunrise": 1646306882,
-      "sunset": 1646347929,
-      "moonrise": 1646309880,
-      "moonset": 1646352120,
-      "moon_phase": 0.03,
-      "temp": {
-        "day": 281.63,
-        "min": 271.72,
-        "max": 282.21,
-        "night": 271.72,
-        "eve": 277.99,
-        "morn": 280.92
-      },
-      "feels_like": {
-        "day": 277.83,
-        "night": 264.72,
-        "eve": 273.35,
-        "morn": 277.66
-      },
-      "pressure": 1016,
-      "humidity": 55,
-      "dew_point": 273.12,
-      "wind_speed": 9.29,
-      "wind_deg": 3,
-      "wind_gust": 16.48,
-      "weather": [
-        {
-          "id": 500,
-          "main": "Rain",
-          "description": "light rain",
-          "icon": "10d"
-        }
-      ],
-      "clouds": 49,
-      "pop": 0.25,
-      "rain": 0.11,
-      "uvi": 3.38
-    }],
-  "alerts": [
-    {
-      "sender_name": "NWS Philadelphia - Mount Holly (New Jersey, Delaware, Southeastern Pennsylvania)",
-      "event": "Small Craft Advisory",
-      "start": 1646344800,
-      "end": 1646380800,
-      "description": "...SMALL CRAFT ADVISORY REMAINS IN EFFECT FROM 5 PM THIS\nAFTERNOON TO 3 AM EST FRIDAY...\n* WHAT...North winds 15 to 20 kt with gusts up to 25 kt and seas\n3 to 5 ft expected.\n* WHERE...Coastal waters from Little Egg Inlet to Great Egg\nInlet NJ out 20 nm, Coastal waters from Great Egg Inlet to\nCape May NJ out 20 nm and Coastal waters from Manasquan Inlet\nto Little Egg Inlet NJ out 20 nm.\n* WHEN...From 5 PM this afternoon to 3 AM EST Friday.\n* IMPACTS...Conditions will be hazardous to small craft.",
-      "tags": [
-
-      ]
-    }]
-}
-
-console.log(exampleResponse)
-
-
-
 /**
  * Define an API that fetches weather based on lat/lon
  * api: https://rapidapi.com/wirefreethought/api/geodb-cities/
  */
 const Weather = {
-  apiKey: ' ',
-  baseUrl: 'https://api.openweathermap.org/data/3.0/onecall',
+  apiKey: 'd15ea733494fdaa2d82ddebea60af05e',
+  baseUrl: 'https://api.openweathermap.org/data/2.5/onecall',
   getUrl: ({ latitude, longitude }) => Weather.baseUrl + `?lat=${latitude}&lon=${longitude}&exclude=minutely,hourly&units=imperial&appid=${Weather.apiKey}`,
   search: async (city) => {
     try {
       const res = await fetch(Weather.getUrl(city))
-      const { data } = await res.json()
+      const data = await res.json()
+      console.log(data)
       return data
     } catch (error) {
       console.log(error)
@@ -164,7 +50,17 @@ const City = {
 /** Establishes global searchTerm */
 let searchTerm = ''
 /** Updates the searchTerm on input keyup */
-$('form').find('input').on('keyup', (ev) => searchTerm = ev.target.value.trim())
+$('form').find('input').on('keyup', (ev) => {
+  let value = ev.target.value.trim()
+  searchTerm = value
+  /** Displays recent cities if input is cleared */
+  if (value === '') {
+    $('#search-results').html('')
+    for (let city of recent) {
+      $('#search-results').append(renderCityListItem(city))
+    }
+  }
+})
 
 /**
  * Creates and returns a `li.list-group-item` with event handlers already attached
@@ -198,13 +94,13 @@ for (let city of recent) {
  * @param {object} city city to save
  */
 function saveToRecent(city) {
-  if (!recent.find(({ id }) => city.id === id)) {
-    recent.push(city)
-    localStorage.setItem('storedCities', JSON.stringify(recent))
-  }
+  recent = recent.filter(({ id }) => id !== city.id)
+  recent.unshift(city)
+  localStorage.setItem('storedCities', JSON.stringify(recent))
 }
 async function handleSearch(ev) {
   ev.preventDefault()
+  if (searchTerm === '') return
   const cities = await City.search(searchTerm)
   $('#search-results').html('')
   for (let city of cities) {
@@ -215,38 +111,68 @@ $('form').on('submit', handleSearch)
 
 const currentEl = $('#current')
 const fiveDayEl = $('#five-day')
-const getIconUrl = iconName => `http://openweathermap.org/img/wn/${iconName}@2x.png`
 const getDate = dt => moment(dt * 1000).format('LL')
-const getHeaderHtml = (dt, weather) => `<div class='daily-header'><h3>${getDate(dt)}<img src="${getIconUrl(weather[0].icon)}" alt="${weather[0].description}"/></h3><h4><i>${weather[0].description}</i></h4></div>`
-function renderDailyCard({ dt, temp: { min: lowTemp, max: highTemp }, wind_speed, humidity, weather }) {
-  console.log(weather)
+
+const getIconUrl = (iconName, size = 2) => `http://openweathermap.org/img/wn/${iconName}@${size}x.png`
+const getIconHtml = (weather, size = 2) => `<img src="${getIconUrl(weather[0].icon, size)}" alt="${weather[0].description}"/>`
+const getHeaderHtml = (dt, weather) =>
+  `<div class='daily-header'>
+    <h3>${getDate(dt)}</h3>
+    <h4><i>${weather[0].description}</i></h4>
+  </div>`
+const getUvClass = (uvi) => {
+  if (uvi < 3) return 'green'
+  else if (uvi < 6) return 'yellow'
+  else if (uvi < 8) return 'red'
+  else return 'danger'
+}
+const getTempClass = (temp) => {
+  if (temp <= 90) return 'green'
+  else if (temp <= 95) return 'yellow'
+  else if (temp <= 100) return 'red'
+  else return 'danger'
+}
+
+function renderDailyCard({ dt, temp: { min: lowTemp, max: highTemp }, wind_speed, humidity, weather, uvi }) {
   const dailyCard = $(document.createElement('div'))
   dailyCard.addClass('card')
-  $(`<div class='card-body'></div>`).appendTo(dailyCard)
+    .append(getIconHtml(weather, 4), `<div class='card-title'>${getHeaderHtml(dt, weather)}</div>`)
+  dailyCard.find('img').addClass('card-img-top')
+  $(`<div class='card-text'></div>`).appendTo(dailyCard)
     .append(
-      `<div class='card-title'>${getHeaderHtml(dt, weather)}</div>`,
-      `<p class='card-text'>Temp: ${highTemp} / ${lowTemp}&#8457;</p>`,
-      `<p class='card-text'>Wind: ${wind_speed} mph</p>`,
-      `<p class='card-text'>Humidity: ${humidity}%</p>`,
+      `<div class='label ${getTempClass(highTemp)}'>High <span>${highTemp}&#8457;</span></div>
+      <div class='label ${getTempClass(lowTemp)}'>Low <span>${lowTemp}&#8457;</span></div>
+      <div class='label'>Wind <span>${wind_speed} mph</span></div>
+      <div class='label'>Humidity <span>${humidity}%</span></div>
+      <div class='label ${getUvClass(uvi)}'>UV Index <span>${uvi}</span></div>`
     )
   return dailyCard
 }
 async function displayWeather(city) {
-  // const weather = await Weather.search(city)
-  const combinedData = { ...city, ...exampleResponse }
+  const oneCall = await Weather.search(city)
+  const combinedData = { ...city, ...oneCall }
   const { city: cityName, regionCode, countryCode, current: { dt, temp, wind_speed, humidity, uvi, weather }, daily } = combinedData
   currentEl.html('').addClass('hasWeather')
     .append(
-      `<h2>${cityName}, ${regionCode}, ${countryCode}</h2>`,
+      `<h2>${cityName}, ${regionCode}, ${countryCode}${getIconHtml(weather)}</h2>`,
       getHeaderHtml(dt, weather),
-      `<p>Temp: ${temp}&#8457;</p>`,
-      `<p>Wind: ${wind_speed} mph</p>`,
-      `<p>Humidity: ${humidity}%</p>`,
-      `<p>UV Index: ${uvi}</p>`,
+      `<div>
+        <div class='label ${getTempClass(temp)}'>Current Temp: <span>${temp}&#8457;</span></div>
+        <div class='label ${getTempClass(daily[0].temp.max)}'>High: <span>${daily[0].temp.max}&#8457;</span></div>
+        <div class='label ${getTempClass(daily[0].temp.min)}'>Low: <span>${daily[0].temp.min}&#8457;</span></div>
+      </div>`,
+      `<div>
+        <div class='label'>Wind: <span>${wind_speed} mph</span></div>
+        <div class='label'>Humidity: <span>${humidity}%</span></div>
+        <div class='label ${getUvClass(uvi)}'>UV Index: <span>${uvi}</span></div>
+      </div>`,
     )
 
-  fiveDayEl.html('<h2>Five Day Forecast</h2>')
-  for (let day of daily) {
-    fiveDayEl.append(renderDailyCard(day))
+  fiveDayEl.show()
+  let cardGroup = fiveDayEl.find('.card-group').html('')
+  let today = moment(dt * 1000), fiveDaysFromNow = today.clone().add(5, 'days')
+  for (let day of daily.filter(({ dt: timestamp }) => moment(timestamp * 1000).isBetween(today, fiveDaysFromNow, 'day', '(]'))) {
+    cardGroup.append(renderDailyCard(day))
   }
 }
+if (recent.length) displayWeather(recent[0])

@@ -1,3 +1,10 @@
+:root {
+  --light-blue: rgb(175, 228, 248);
+  --dark-blue: rgb(69, 171, 212);
+  --barely-blue: rgb(219, 245, 255);
+}
+
+
 /* General Typography */
 h1 {  font-size: 3em;}
 h2 {  font-size: 2em;}
@@ -27,12 +34,19 @@ h1 {
 
 body {
   font-family: 'Sarala', Roboto, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 header {
   text-align: center;
-  background-image: linear-gradient(90deg, white, skyblue);
+  background-image: linear-gradient(-90deg, white, skyblue);
+}
+
+h2 img {
+  margin: -20px 1rem -50px;
+  border-radius: 50%;
+  background-color: var(--light-blue);
+  box-shadow: 0 0 15px var(--dark-blue);
 }
 
 .btn-fluid {
@@ -56,18 +70,73 @@ header {
   border-radius: 0.25rem;
   border: 1px solid gray;
 }
+.label {
+  display: inline-block;
+  border-radius: 3px;
+  border: 1px solid skyblue;
+  padding: 0 8px;
+  margin-bottom: 0.5rem;
+}
+.label+.label {
+  margin-left: 4px;
+}
+.label span {
+  position: relative;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 0 2px 2px 0;
+  background-color: var(--barely-blue);
+  left: 8px;
+}
+
+.card-text {
+  padding: 0.5rem;
+}
+.card-text .label {
+  margin: 2px ;
+}
+
+.label.green {
+  border-color: rgb(65, 181, 67);
+}
+.label.green span {
+  background-color: rgb(185, 228, 186);
+}
+.label.yellow {
+  border-color: rgb(181, 177, 45);
+}
+.label.yellow span {
+  background-color: rgb(242, 230, 121);
+}
+.label.red {
+  border-color: rgb(181, 82, 65);
+}
+.label.red span {
+  background-color: rgb(228, 185, 185);
+}
+.label.danger {
+  border-color: rgb(173, 0, 0);
+}
+.label.danger span {
+  background-color: rgb(255, 93, 93);
+}
 
 #five-day {
-  display: flex;
-  flex-wrap: wrap;
-}
-#five-day h2 {
-  flex-basis: 100%;
+  display: none;
+  margin-bottom: 1rem;
 }
 
-.daily-header img {
-  margin: -40px -1rem -40px 0;
+p {
+  margin-bottom: 0.5rem;
 }
-.daily-header h4 {
-  margin-left: 0.5rem;
+
+.card-title {
+  background-color: var(--light-blue);
+  padding: 0 1rem;
+  margin-bottom: 0;
 }
+
+.card img {
+  background-image: linear-gradient(var(--dark-blue),var(--light-blue));
+}
+
