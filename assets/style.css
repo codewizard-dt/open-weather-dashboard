@@ -34,7 +34,7 @@ h1 {
 
 body {
   font-family: 'Sarala', Roboto, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 header {
@@ -42,6 +42,11 @@ header {
   background-image: linear-gradient(-90deg, white, skyblue);
 }
 
+.text-bigger {
+  font-size: 1.4em;
+}
+
+/* Weather Icon */
 h2 img {
   margin: -20px 1rem -50px;
   border-radius: 50%;
@@ -49,10 +54,18 @@ h2 img {
   box-shadow: 0 0 15px var(--dark-blue);
 }
 
+/* Generic flex styling */
+.flex .flex-row {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+/* Full width button */
 .btn-fluid {
   width: 100%;
 }
 
+/* Search Result Side Bar Styling */
 #search form button {
   margin-top: 0.5rem;
 }
@@ -64,12 +77,20 @@ h2 img {
   background-color: rgb(240,240,240);
 }
 
+/* Styling for main weather display ONLY IF it contains weather info */
 #current.hasWeather {
   padding: 1rem;
   margin: 1rem 0;
   border-radius: 0.25rem;
   border: 1px solid gray;
 }
+
+#five-day {
+  display: none;
+  margin-bottom: 1rem;
+}
+
+/* Custom label styling */
 .label {
   display: inline-block;
   border-radius: 3px;
@@ -77,9 +98,13 @@ h2 img {
   padding: 0 8px;
   margin-bottom: 0.5rem;
 }
+
+/* Sibling labels get spaces */
 .label+.label {
   margin-left: 4px;
 }
+
+/* Label span contains the statistic */
 .label span {
   position: relative;
   display: inline-block;
@@ -89,13 +114,55 @@ h2 img {
   left: 8px;
 }
 
-.card-text {
-  padding: 0.5rem;
-}
-.card-text .label {
-  margin: 2px ;
+/* Card header includes icon and title */
+.my-card-header {
+  background-image: linear-gradient(var(--dark-blue),var(--light-blue));
 }
 
+/* Custom styling for card group */
+.my-card-group {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 2px;
+  border-radius: 0.25rem;
+  max-width: 100%;
+  align-items: center;
+}
+/* Custom styling for individual cards */
+.my-card-group .card {
+  flex-grow: 1;
+  min-width: 10em;
+  max-width: 15rem;
+  overflow: hidden;
+}
+
+/* Weather icon repeating across */
+.img-card-header {
+  width: 100%;
+  height: 6em;
+  background-size: contain;
+  background-position: center;
+}
+
+/* Custom styling for .card-text */
+.my.card .card-text {
+  display: flex;
+  flex-flow: column wrap;
+  gap: 2px;
+  padding: 0.5rem;
+}
+/* Customize label within card */
+.my.card .card-text .label {
+  align-self: flex-start;
+  margin: 0;
+}
+/* Custom style for .card-title */
+.my.card .card-title {
+  padding: 0 1rem;
+  margin-bottom: 0;
+}
+
+/* Colored label styles */
 .label.green {
   border-color: rgb(65, 181, 67);
 }
@@ -121,22 +188,19 @@ h2 img {
   background-color: rgb(255, 93, 93);
 }
 
-#five-day {
-  display: none;
-  margin-bottom: 1rem;
+/* RESPONSIVE STYLES */
+@media screen and (max-width: 381px) {
+  /* fixes image overlap at small screens */
+  h2 img {
+    margin: 1rem;
+  }
 }
-
-p {
-  margin-bottom: 0.5rem;
+@media screen and (max-width: 431px) {
+  /* Custom card styles for small screens */
+  .my.card {
+    max-width: 100%;
+  }
+  .my.card .card-text {
+    flex-direction: row;
+  }
 }
-
-.card-title {
-  background-color: var(--light-blue);
-  padding: 0 1rem;
-  margin-bottom: 0;
-}
-
-.card img {
-  background-image: linear-gradient(var(--dark-blue),var(--light-blue));
-}
-

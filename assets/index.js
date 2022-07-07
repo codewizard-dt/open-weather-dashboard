@@ -68,10 +68,13 @@ $('form').find('input').on('keyup', (ev) => {
  * @returns `<li>` element
  */
 function renderCityListItem(city) {
-  const { city: name, region, country, countryCode } = city
+  const { city: name, region, country, countryCode, id } = city
   const li = document.createElement('li')
   li.classList.add('list-group-item')
+  /** Data-id for sorting */
+  li.setAttribute('data-id', id)
   li.innerHTML = `${name}, ${region}, ${countryCode == 'US' ? countryCode : country}`
+  /** Adds event listener to search results */
   $(li).on('click', () => {
     saveToRecent(city)
     displayWeather(city)
@@ -98,6 +101,12 @@ function saveToRecent(city) {
   recent.unshift(city)
   localStorage.setItem('storedCities', JSON.stringify(recent))
 }
+/**
+ * Handles search form submission
+ * Renders search results
+ * @param {*} ev submit event
+ * @returns void
+ */
 async function handleSearch(ev) {
   ev.preventDefault()
   if (searchTerm === '') return
@@ -109,23 +118,46 @@ async function handleSearch(ev) {
 }
 $('form').on('submit', handleSearch)
 
+// Global references to main elements
 const currentEl = $('#current')
 const fiveDayEl = $('#five-day')
+
+/**
+ * Formats the incoming date from the weather API
+ * @param {number} dt dt from OpenWeather API (is in seconds)
+ * @returns date as string
+ */
 const getDate = dt => moment(dt * 1000).format('LL')
 
+/** Gets icon url from open weather */
 const getIconUrl = (iconName, size = 2) => `http://openweathermap.org/img/wn/${iconName}@${size}x.png`
+/** Gets Html string for icon */
 const getIconHtml = (weather, size = 2) => `<img src="${getIconUrl(weather[0].icon, size)}" alt="${weather[0].description}"/>`
+/** Get Html string for card header */
+const getIconCardHeader = (weather) => `<div class='img-card-header' style='background-image:url(${getIconUrl(weather[0].icon)})'></div>`
+/** Gets Html string for page header */
 const getHeaderHtml = (dt, weather) =>
   `<div class='daily-header'>
     <h3>${getDate(dt)}</h3>
     <h4><i>${weather[0].description}</i></h4>
   </div>`
+/**
+ * Gets color class bases on UV index severity
+ * https://www.epa.gov/sunsafety/uv-index-scale-0
+ * @param {number} uvi uv index
+ * @returns class string
+ */
 const getUvClass = (uvi) => {
   if (uvi < 3) return 'green'
   else if (uvi < 6) return 'yellow'
   else if (uvi < 8) return 'red'
   else return 'danger'
 }
+/**
+ * Gets color class based on Temperature safety
+ * @param {number} temp temperature
+ * @returns class string
+ */
 const getTempClass = (temp) => {
   if (temp <= 90) return 'green'
   else if (temp <= 95) return 'yellow'
@@ -133,21 +165,32 @@ const getTempClass = (temp) => {
   else return 'danger'
 }
 
+/**
+ * Renders a daily weather card based on an object from OpenWeather
+ * @param {object} param0 daily weather info from OpenWeather
+ * @returns weather card
+ */
 function renderDailyCard({ dt, temp: { min: lowTemp, max: highTemp }, wind_speed, humidity, weather, uvi }) {
-  const dailyCard = $(document.createElement('div'))
-  dailyCard.addClass('card')
-    .append(getIconHtml(weather, 4), `<div class='card-title'>${getHeaderHtml(dt, weather)}</div>`)
-  dailyCard.find('img').addClass('card-img-top')
-  $(`<div class='card-text'></div>`).appendTo(dailyCard)
-    .append(
-      `<div class='label ${getTempClass(highTemp)}'>High <span>${highTemp}&#8457;</span></div>
-      <div class='label ${getTempClass(lowTemp)}'>Low <span>${lowTemp}&#8457;</span></div>
-      <div class='label'>Wind <span>${wind_speed} mph</span></div>
-      <div class='label'>Humidity <span>${humidity}%</span></div>
-      <div class='label ${getUvClass(uvi)}'>UV Index <span>${uvi}</span></div>`
-    )
-  return dailyCard
+  return $(`
+    <div class="my card">
+      <div class="my-card-header">
+        ${getIconCardHeader(weather)}
+        <div class="card-title">${getHeaderHtml(dt, weather)}</div>
+      </div>
+      <div class="card-text">
+        <div class='label ${getTempClass(highTemp)}'>High <span>${highTemp}&#8457;</span></div>
+        <div class='label ${getTempClass(lowTemp)}'>Low <span>${lowTemp}&#8457;</span></div>
+        <div class='label'>Wind <span>${wind_speed} mph</span></div>
+        <div class='label'>Humidity <span>${humidity}%</span></div>
+        <div class='label ${getUvClass(uvi)}'>UV Index <span>${uvi}</span></div>
+      </div>
+    </div>
+  `)
 }
+/**
+ * Retrieves weather based on city lat/lon
+ * @param {object} city city info from GeoDbCities api
+ */
 async function displayWeather(city) {
   const oneCall = await Weather.search(city)
   const combinedData = { ...city, ...oneCall }
@@ -156,12 +199,10 @@ async function displayWeather(city) {
     .append(
       `<h2>${cityName}, ${regionCode}, ${countryCode}${getIconHtml(weather)}</h2>`,
       getHeaderHtml(dt, weather),
-      `<div>
+      `<div class='flex flex-row text-bigger'>
         <div class='label ${getTempClass(temp)}'>Current Temp: <span>${temp}&#8457;</span></div>
         <div class='label ${getTempClass(daily[0].temp.max)}'>High: <span>${daily[0].temp.max}&#8457;</span></div>
         <div class='label ${getTempClass(daily[0].temp.min)}'>Low: <span>${daily[0].temp.min}&#8457;</span></div>
-      </div>`,
-      `<div>
         <div class='label'>Wind: <span>${wind_speed} mph</span></div>
         <div class='label'>Humidity: <span>${humidity}%</span></div>
         <div class='label ${getUvClass(uvi)}'>UV Index: <span>${uvi}</span></div>
@@ -169,10 +210,13 @@ async function displayWeather(city) {
     )
 
   fiveDayEl.show()
-  let cardGroup = fiveDayEl.find('.card-group').html('')
+  let cardGroup = fiveDayEl.find('.my-card-group').html('')
   let today = moment(dt * 1000), fiveDaysFromNow = today.clone().add(5, 'days')
   for (let day of daily.filter(({ dt: timestamp }) => moment(timestamp * 1000).isBetween(today, fiveDaysFromNow, 'day', '(]'))) {
     cardGroup.append(renderDailyCard(day))
   }
+  $('#search-results').find('li').removeClass('active')
+  $('#search-results').find('li').filter(`[data-id=${city.id}]`).prependTo($('#search-results')).addClass('active')
 }
+/** If there are cities in local storage, load the first one */
 if (recent.length) displayWeather(recent[0])
