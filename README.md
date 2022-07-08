@@ -13,6 +13,10 @@ Sends a search query string and receives geographical data in return.
 ## Local Storage
 When a city is clicked it's added to local storage. A **list of recent cities is maintained** and loaded upon page refresh.
 
+## Weather API
+Uses [OpenWeather One Call API](https://openweathermap.org/api/one-call-3).
+Sends latitude and longitude from GeoDB response and receives weather data in return
+
 ## Current Weather
 When a city is clicked its weather data is retrieved and all the current weather conditions are displayed:
 - `current temp`
@@ -30,6 +34,11 @@ Since the intensity of the UV index and temperature are of paramount concern for
 - `yellow` for `moderate` (UV < 6, T < 95)
 - `red` for `high` (UV < 8, T < 100)
 - `dark red` for `danger` (UV > 11, T < 105)
+
+## Packages
+[jQuery](https://cdnjs.com/libraries/jquery) for DOM
+[Bootstrap](https://cdnjs.com/libraries/bootstrap/5.1.3) for HTML Components
+[Moment](https://cdnjs.com/libraries/moment.js/2.29.0) to handle Dates
 
 ## Deployed Link
 [Weather Dashboard on Github Pages](https://codewizard-dt.github.io/open-weather-dashboard/)
