@@ -36,9 +36,9 @@ Since the intensity of the UV index and temperature are of paramount concern for
 - `dark red` for `danger` (UV > 11, T < 105)
 
 ## Packages
-[jQuery](https://cdnjs.com/libraries/jquery) for DOM
-[Bootstrap](https://cdnjs.com/libraries/bootstrap/5.1.3) for HTML Components
-[Moment](https://cdnjs.com/libraries/moment.js/2.29.0) to handle Dates
+- [jQuery](https://cdnjs.com/libraries/jquery) for DOM
+- [Bootstrap](https://cdnjs.com/libraries/bootstrap/5.1.3) for HTML Components
+- [Moment](https://cdnjs.com/libraries/moment.js/2.29.0) to handle Dates
 
 ## Deployed Link
 [Weather Dashboard on Github Pages](https://codewizard-dt.github.io/open-weather-dashboard/)
