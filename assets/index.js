@@ -85,7 +85,7 @@ function renderCityListItem(city) {
 /** Establishes global list of recent cities */
 let recent = []
 /** Checks local storage for recent cities */
-const storedCities = localStorage.getItem('storedCities')
+const storedCities = localStorage.getItem('WeatherApiCache')
 if (storedCities) recent.push(...JSON.parse(storedCities))
 /** Renders recent cities as search results */
 for (let city of recent) {
@@ -99,7 +99,7 @@ for (let city of recent) {
 function saveToRecent(city) {
   recent = recent.filter(({ id }) => id !== city.id)
   recent.unshift(city)
-  localStorage.setItem('storedCities', JSON.stringify(recent))
+  localStorage.setItem('WeatherApiCache', JSON.stringify(recent))
 }
 /**
  * Handles search form submission
