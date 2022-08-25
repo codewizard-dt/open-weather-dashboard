@@ -1,6 +1,7 @@
 # Weather Dashboard
 
 This is a weather app that can give you the weather in any city across the globe
+[Github Pages](https://codewizard-dt.github.io/open-weather-dashboard/)
 
 ## Search Function
 Uses [GeoDB Cities API](https://rapidapi.com/wirefreethought/api/geodb-cities/).
